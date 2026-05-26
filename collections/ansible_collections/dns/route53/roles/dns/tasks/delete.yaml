@@ -1,25 +1,11 @@
 ---
-- name: "Look up existing DNS record via Route 53 - {{ dns_record_name }}"
-  amazon.aws.route53:
-    state: get
-    zone: "{{ dns_zone }}"
-    record: "{{ dns_record_name }}"
-    type: "{{ dns_record_type }}"
-    access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') | trim }}"
-    secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') | trim }}"
-  register: __dns_route53_existing
-  no_log: true
-
 - name: "Delete DNS record via Route 53 - {{ dns_record_name }}"
   amazon.aws.route53:
     state: absent
     zone: "{{ dns_zone }}"
     record: "{{ dns_record_name }}"
     type: "{{ dns_record_type }}"
-    ttl: "{{ __dns_route53_existing.set.ttl }}"
-    value: "{{ __dns_route53_existing.set.value }}"
     wait: true
     access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') | trim }}"
     secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') | trim }}"
-  when: __dns_route53_existing.set is defined and (__dns_route53_existing.set | length > 0)
   no_log: true
