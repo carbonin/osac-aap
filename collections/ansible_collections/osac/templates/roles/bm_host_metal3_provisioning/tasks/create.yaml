@@ -121,12 +121,12 @@
             - name: Parse existing cloud-init and merge SSH key
               ansible.builtin.set_fact:
                 final_user_data: >-
-                  #cloud-config
-                  {{ (existing_user_data | regex_replace('^#cloud-config\s*\n?', '') | from_yaml | default({}))
-                     | combine({'ssh_authorized_keys':
-                         ((existing_user_data | regex_replace('^#cloud-config\s*\n?', '') | from_yaml | default({})).ssh_authorized_keys | default([]))
-                         + [ssh_key]})
-                     | to_nice_yaml }}
+                  {{ '#cloud-config\n' +
+                     ((existing_user_data | regex_replace('^#cloud-config\s*\n?', '') | from_yaml | default({}))
+                      | combine({'ssh_authorized_keys':
+                          ((existing_user_data | regex_replace('^#cloud-config\s*\n?', '') | from_yaml | default({})).ssh_authorized_keys | default([]))
+                          + [ssh_key]})
+                      | to_nice_yaml) }}
 
         - name: Create userData Secret in BMH namespace
           kubernetes.core.k8s:
